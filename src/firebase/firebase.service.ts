@@ -1,41 +1,30 @@
 import * as admin from 'firebase-admin';
 import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
-import { FB_SERVICE } from './service';
-
-let app: admin.app.App;
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class FirebaseService implements OnApplicationBootstrap {
-  // private firebaseApp: admin.app.App;
+  private firebaseApp: admin.app.App;
+
+  constructor(private readonly configService: ConfigService) {}
 
   async onApplicationBootstrap() {
-    if (!app) {
-      app = admin.initializeApp({
+    if (admin.apps.length === 0) {
+      this.firebaseApp = admin.initializeApp({
         credential: admin.credential.cert({
-          clientEmail: FB_SERVICE.client_email,
-          privateKey: FB_SERVICE.private_key,
-          projectId: FB_SERVICE.project_id,
+          clientEmail: this.configService.get<string>('CLIENT_EMAIL'),
+          privateKey: this.configService
+            .get<string>('PRIVATE_KEY')
+            .replace(/\\n/g, '\n'),
+          projectId: this.configService.get<string>('PROJECT_ID'),
         }),
       });
+    } else {
+      this.firebaseApp = admin.app();
     }
   }
 
-  setup() {
-    return app;
+  setup(): admin.app.App {
+    return this.firebaseApp;
   }
-
-  // constructor() {
-  //   if (admin.apps.length < 1) {
-  //     console.log('tess');
-  //     this.firebaseApp = admin.initializeApp({
-  //       credential: admin.credential.cert({
-  //         clientEmail: FB_SERVICE.client_email,
-  //         privateKey: FB_SERVICE.private_key,
-  //         projectId: FB_SERVICE.project_id,
-  //       }),
-  //     });
-  //   } else {
-  //     this.firebaseApp = admin.app();
-  //   }
-  // }
 }
