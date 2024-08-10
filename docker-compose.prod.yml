@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  nest-api:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    container_name: nest-api
+    restart: always
+    ports:
+      - 3001:3001
+    environment:
+      - PORT=3001
+      - DATABASE_URL=mysql://root:1234@mysql_db:3306/nestdb
+    depends_on:
+      - mysql_db
+
+  mysql_db:
+    image: mysql:9.0
+    command: --lower_case_table_names=1
+    container_name: mysqlprisma
+    restart: unless-stopped
+    ports:
+      - 3306:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=1234
+      - MYSQL_DATABASE=nestdb
+    healthcheck:
+      test: ['CMD', 'mysqladmin', 'ping', '-h127.0.0.1', '-P3306']
+      interval: 5s
+      timeout: 2s
+      retries: 20
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+volumes:
+  mysql_data:
