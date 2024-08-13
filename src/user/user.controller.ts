@@ -5,7 +5,7 @@ import {
   Controller,
   Get,
   Post,
-  UseGuards,
+  // UseGuards,
 } from '@nestjs/common';
 import { Res } from 'src/interface/index.interface';
 import {
@@ -14,7 +14,7 @@ import {
   UserCreateSchema,
 } from 'src/interface/user.interface';
 import { UserService } from './user.service';
-import { FirebaseAuthGuard } from 'src/firebase/firebase.guard';
+// import { FirebaseAuthGuard } from 'src/firebase/firebase.guard';
 import { ValidationService } from 'src/validation/validation.service';
 import { FirebaseService } from 'src/firebase/firebase.service';
 
@@ -27,7 +27,7 @@ export class UserController {
   ) {}
 
   @Get()
-  @UseGuards(FirebaseAuthGuard)
+  // @UseGuards(FirebaseAuthGuard)
   async findAll(): Promise<Res<IUser[]>> {
     try {
       const data = await this.userService.findAll();
@@ -78,7 +78,6 @@ export class UserController {
 
       const data = await this.userService.create({
         data: {
-          id: 1,
           email: result.email,
           password: newPassword,
         },
