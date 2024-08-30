@@ -28,6 +28,15 @@ services:
     networks:
       - app_network
 
+  backup:
+    image: mysql:8.0
+    container_name: backup-mysql
+    restart: always
+    command: sh -c "mysqldump -u root -p1234 nestdb > /backup/backup.sql"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./backup:/backup
+
 networks:
   app_network:
     driver: bridge
